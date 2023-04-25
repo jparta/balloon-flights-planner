@@ -1,0 +1,2 @@
+astra @ git+https://github.com/jparta/astra_simulator@master
+numpy

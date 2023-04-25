@@ -11,13 +11,15 @@ logging.basicConfig(level=logging.DEBUG)
 np.random.seed(42)
 
 output_path = Path("astra_out")
-time_diff_days = 1
+days_to_launch = 1
+launch_datetime = datetime.now() + timedelta(days=days_to_launch)
+
 
 LAUNCH = {
     "launchSiteLat": 60.157502,
     "launchSiteLon": 24.654051,
     "launchSiteElev": 40,
-    "launchTime": datetime.now() + timedelta(days=1),
+    "launchTime": launch_datetime,
     "inflationTemperature": 10,
     "forceNonHD": False
 }

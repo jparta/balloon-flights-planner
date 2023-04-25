@@ -1,2 +1,3 @@
 astra @ git+https://github.com/jparta/astra_simulator@master
-numpy
+flask ~= 2.2
+numpy ~= 1.24

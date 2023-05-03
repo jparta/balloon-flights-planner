@@ -1,26 +1,39 @@
-from gevent import monkey
-monkey.patch_all()
+# Monkey patching has to be done before importing anything else
+# from gevent import monkey
+# monkey.patch_all()
 
 import logging
 import subprocess
 import sys
-from time import sleep
 
+# Import here so that grequests does monkey patching to ssl before it's imported elsewhere
+from simulations import run_sim
+
+import folium
 from flask import Flask, copy_current_request_context, render_template, session, request
 from flask_socketio import SocketIO, emit, disconnect
 
 from astra.global_tools import progress_vals_to_msg
-from simulations import run_sim
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecret'
 sio = SocketIO(app)
-logging.getLogger('geventwebsocket.handler').setLevel(logging.ERROR)
+logging.getLogger('geventwebsocket.handler').setLevel(logging.INFO)
 
 
 @app.route('/')
 def index():
-    return render_template('index.html', async_mode=sio.async_mode)
+    m = folium.Map()
+        # set the iframe width and height
+    m.get_root().width = "100%"
+    m.get_root().height = "100%"
+    iframe = m.get_root()._repr_html_()
+    return render_template(
+        'index.html',
+        iframe=iframe,
+        async_mode=sio.async_mode
+    )
 
 
 def run_sim_keep_client_updated_using_callback(sid: str):
@@ -81,6 +94,6 @@ def disconnect_request():
 
 
 if __name__ == '__main__':
-    sio.run(app, debug=True)
+    sio.run(app)
 
 

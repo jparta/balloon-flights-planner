@@ -1,5 +1,6 @@
 astra @ git+https://github.com/jparta/astra_simulator@master
 flask ~= 2.2
-flask_socketio ~= 5.8
+flask_socketio ~= 5.3
+folium ~= 0.14
 gevent-websocket ~= 0.10
 numpy ~= 1.24

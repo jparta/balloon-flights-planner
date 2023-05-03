@@ -1,0 +1,17 @@
+#holder{
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+#interaction{
+    position: absolute;
+    top: 5em;
+    right: 5em;
+    width: 20em;
+    height: 20em;
+    padding: 1em;
+    background-color: rgba(211, 211, 211, 0.6);
+    border: 1px solid rgba(95, 95, 95, 0.6);
+    border-radius: 2%;
+}

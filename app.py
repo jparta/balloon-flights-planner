@@ -66,33 +66,6 @@ def run_sim_endpoint_0():
     run_sim_keep_client_updated_using_callback(sid)
 
 
-@sio.on('my_event')
-def received_my_event(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']})
-
-
-@sio.on('my_broadcast_event')
-def test_broadcast_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']},
-         broadcast=True)
-
-
-@sio.on('disconnect_request')
-def disconnect_request():
-    @copy_current_request_context
-    def can_disconnect():
-        disconnect()
-
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': 'Disconnected!', 'count': session['receive_count']},
-         callback=can_disconnect)
-
-
 if __name__ == '__main__':
     sio.run(app)
 

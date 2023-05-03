@@ -28,7 +28,7 @@
                 if (cb)
                     cb();
             });
-            $('#run_sim').addEventListener("click", (event) => {
+            $('#run_sim').on("click", (event) => {
                 socket.emit('run_sim');
                 return false;
             });

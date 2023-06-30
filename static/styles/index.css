@@ -1,17 +1,33 @@
-#holder{
+#holder {
     width: 100vw;
     height: 100vh;
     position: relative;
 }
 
-#interaction{
+#interaction {
     position: absolute;
     top: 5em;
     right: 5em;
-    width: 20em;
+    width: 30em;
     height: 20em;
     padding: 1em;
     background-color: rgba(211, 211, 211, 0.6);
     border: 1px solid rgba(95, 95, 95, 0.6);
     border-radius: 2%;
+}
+
+#sim_progress {
+    height: 50%;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: .45rem;
+}
+::-webkit-scrollbar-thumb {
+    background-color: rgba(27, 27, 27, .4);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-track{
+    background: transparent;
 }

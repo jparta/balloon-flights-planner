@@ -1,6 +1,5 @@
 import io
 import logging
-from contextlib import redirect_stdout, redirect_stderr
 from datetime import datetime, timedelta
 from pathlib import Path
 import typing
@@ -24,7 +23,7 @@ LAUNCH = {
     "launchSiteElev": 40,
     "launchTime": launch_datetime,
     "inflationTemperature": 10,
-    "forceNonHD": False
+    "forceNonHD": False,
 }
 
 FLIGHT_SIM = {
@@ -36,14 +35,22 @@ FLIGHT_SIM = {
     "numberOfSimRuns": 10,
     "trainEquivSphereDiam": 0.285,  # Styrox probe cuboid area-equivalent diameter
     "outputPath": output_path.absolute(),
-#    "debugging": True,
+    #    "debugging": True,
     "log_to_file": True,
 }
 
-def run_sim(program_out_redirect_buffer: typing.TextIO | None = None, progress_handler=None):
+
+def run_sim(
+    program_out_redirect_buffer: typing.TextIO | None = None, progress_handler=None
+):
     sim_environment = forecastEnvironment(**LAUNCH, progressHandler=progress_handler)
-    the_flight = flight(**FLIGHT_SIM, environment=sim_environment, progress_stream=program_out_redirect_buffer)
+    the_flight = flight(
+        **FLIGHT_SIM,
+        environment=sim_environment,
+        progress_stream=program_out_redirect_buffer
+    )
     the_flight.run()
+
 
 if __name__ == "__main__":
     run_sim()

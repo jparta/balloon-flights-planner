@@ -11,13 +11,13 @@ from flask import Flask, copy_current_request_context, render_template, session,
 from flask_socketio import SocketIO, emit, disconnect
 
 from astra.global_tools import progress_vals_to_msg
+from find_launch_time.logic.find_time import make_launch_params, make_flight_params
 from simulations import run_sim
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecret'
 sio = SocketIO(app)
-logging.getLogger('geventwebsocket.handler').setLevel(logging.INFO)
 
 
 @app.route('/')

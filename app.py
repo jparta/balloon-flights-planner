@@ -6,14 +6,12 @@ import logging
 import subprocess
 import sys
 
-# Import here so that grequests does monkey patching to ssl before it's imported elsewhere
-from simulations import run_sim
-
 import folium
 from flask import Flask, copy_current_request_context, render_template, session, request
 from flask_socketio import SocketIO, emit, disconnect
 
 from astra.global_tools import progress_vals_to_msg
+from simulations import run_sim
 
 
 app = Flask(__name__)

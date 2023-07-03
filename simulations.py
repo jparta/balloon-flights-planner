@@ -2,6 +2,7 @@ import io
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
+import shutil
 import typing
 
 import numpy as np
@@ -13,6 +14,8 @@ logging.basicConfig(level=logging.DEBUG)
 np.random.seed(42)
 
 output_path = Path("astra_out")
+shutil.rmtree(output_path, ignore_errors=True)
+
 days_to_launch = 1
 launch_datetime = datetime.now() + timedelta(days=days_to_launch)
 

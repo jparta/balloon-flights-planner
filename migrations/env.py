@@ -2,6 +2,7 @@ import logging
 from logging.config import fileConfig
 
 from flask import current_app
+from geoalchemy2 import alembic_helpers, load_spatialite
 
 from alembic import context
 
@@ -65,7 +66,12 @@ def run_migrations_offline():
     """
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url, target_metadata=get_metadata(), literal_binds=True
+        url=url,
+        target_metadata=get_metadata(),
+        literal_binds=True,
+        include_object=alembic_helpers.include_object,
+        process_revision_directives=alembic_helpers.writer,
+        render_item=alembic_helpers.render_item,
     )
 
     with context.begin_transaction():
@@ -92,12 +98,18 @@ def run_migrations_online():
 
     connectable = get_engine()
 
+    if connectable.dialect.name == "sqlite":
+        # Load the SpatiaLite extension when the engine connects to the DB
+        listen(connectable, 'connect', load_spatialite)
+
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
-            process_revision_directives=process_revision_directives,
-            **current_app.extensions['migrate'].configure_args
+            process_revision_directives=alembic_helpers.writer,
+            **current_app.extensions['migrate'].configure_args,
+            include_object=alembic_helpers.include_object,
+            render_item=alembic_helpers.render_item,
         )
 
         with context.begin_transaction():

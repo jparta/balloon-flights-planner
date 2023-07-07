@@ -52,6 +52,31 @@ def get_metadata():
     return target_db.metadata
 
 
+def compose_include_object(funcs):
+    """Compose include_object functions into one, excluding objects if any
+    function returns False."""
+    def composed(target, name, type_, reflected, compare_to):
+        for func in funcs:
+            if func(target, name, type_, reflected, compare_to) == False:
+                return False
+        return True
+    return composed
+
+
+def include_object(object, name, type_, reflected, compare_to):
+    """Exclude APScheduler objects
+    """
+    exclude = {
+        "table": [
+            "apscheduler_jobs",
+        ],
+    }
+    for exclude_type, names in exclude.items():
+        if type_ == exclude_type and name in names:
+            return False
+    return True
+
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -69,7 +94,12 @@ def run_migrations_offline():
         url=url,
         target_metadata=get_metadata(),
         literal_binds=True,
-        include_object=alembic_helpers.include_object,
+        include_object=compose_include_object(
+            [
+                alembic_helpers.include_object,
+                include_object,
+            ]
+        ),
         process_revision_directives=alembic_helpers.writer,
         render_item=alembic_helpers.render_item,
     )
@@ -108,7 +138,12 @@ def run_migrations_online():
             target_metadata=get_metadata(),
             process_revision_directives=alembic_helpers.writer,
             **current_app.extensions['migrate'].configure_args,
-            include_object=alembic_helpers.include_object,
+            include_object=compose_include_object(
+                [
+                    alembic_helpers.include_object,
+                    include_object,
+                ]
+            ),
             render_item=alembic_helpers.render_item,
         )
 

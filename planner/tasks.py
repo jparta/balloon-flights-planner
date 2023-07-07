@@ -27,7 +27,6 @@ def run_astra_sims_background():
             for name, gdf in prediction.__dict__.items()
             if name in field_name_conversion and gdf is not None
         }
-        scheduler.app.logger.info(f"data srids: {[wkbele.srid for wkbele in out_data.values()]}")
         prediction_data = TrajectoryPredictionData(**out_data)
         prediction_db_objects.append(prediction_data)
     with scheduler.app.app_context():

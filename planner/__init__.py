@@ -16,7 +16,7 @@ def create_app(config_class=Config):
 
     scheduler.init_app(app)
     scheduler.start()
-    atexit.register(lambda: scheduler.shutdown(wait=False))
+    # atexit.register(lambda: scheduler.shutdown(wait=False))
 
     # Register blueprints here
     from planner.main import bp as main_bp

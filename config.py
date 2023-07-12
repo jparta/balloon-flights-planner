@@ -23,13 +23,6 @@ class Config:
             'replace_existing': True,
             'timezone': 'UTC',
         },
-        {
-            'id': 'run_astra_sims_within_10_seconds',
-            'func': 'planner.tasks:run_astra_sims_background',
-            'trigger': 'date',
-            'run_date': datetime.now(timezone.utc) + timedelta(seconds=10),
-            'replace_existing': True,
-        }
     ]
     SCHEDULER_JOBSTORES = {
         'default': SQLAlchemyJobStore(url=SQLALCHEMY_DATABASE_URI)

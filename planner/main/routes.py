@@ -36,13 +36,21 @@ def index():
         kdes.append(gs["kde"])
         bad_landing_areas.append(gs["bad_landing_areas"])
         landing_points.append(gs["landing_points"])
-    for layer in [kdes, bad_landing_areas, landing_points]:
-        layer_joined = join_list_of_geoseries(layer)
+    layer_data = {
+        "Kernel density estimate": kdes,
+        "Bad landing areas": bad_landing_areas,
+        "Predicted landing locations": landing_points,
+    }
+    for layer_name, layer_geometry in layer_data.items():
+        layer_joined = join_list_of_geoseries(layer_geometry)
         if layer_joined is None:
             continue
         layer_json = layer_joined.to_json(to_wgs84=True)
-        folium.GeoJson(layer_json).add_to(m)
-    folium.LayerControl().add_to(m)
+        folium.GeoJson(
+            layer_json,
+            name=layer_name,
+        ).add_to(m)
+    folium.LayerControl(collapsed=False).add_to(m)
 
     m.fit_bounds(m.get_bounds(), padding=(30, 30))
 

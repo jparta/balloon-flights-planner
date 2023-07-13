@@ -1,11 +1,23 @@
 import folium
 import geopandas as gpd
-from flask import render_template
+from flask import render_template, current_app
 import pandas as pd
 
 from planner import db
 from planner.main import bp
 from planner.models import TrajectoryPredictionData
+
+
+def join_list_of_geoseries(geolist) -> gpd.GeoDataFrame:
+    geolist = [geoseries for geoseries in geolist if geoseries is not None]
+    if not geolist:
+        return None
+    shared_crs = geolist[0].crs
+    if not all([geoseries.crs == shared_crs for geoseries in geolist]):
+        raise ValueError(f"All GeoSeries must have the same crs, but got {[geoseries.crs for geoseries in geolist]}")
+    # concatenate the lit of GeoDataSeries into a single GeoDataFrame
+    joined = gpd.GeoDataFrame(geometry=pd.concat(geolist, ignore_index=True), crs=shared_crs)
+    return joined
 
 
 @bp.route('/')
@@ -25,17 +37,14 @@ def index():
         bad_landing_areas.append(gs["bad_landing_areas"])
         landing_points.append(gs["landing_points"])
     for layer in [kdes, bad_landing_areas, landing_points]:
-        layer = [geoseries for geoseries in layer if geoseries is not None]
-        if not layer:
+        layer_joined = join_list_of_geoseries(layer)
+        if layer_joined is None:
             continue
-        shared_crs = layer[0].crs
-        if not all([geoseries.crs == shared_crs for geoseries in layer]):
-            raise ValueError(f"All GeoSeries must have the same crs, but got {[geoseries.crs for geoseries in layer]}")
-        # concatenate the lit of GeoDataSeries into a single GeoDataFrame
-        layer = gpd.GeoDataFrame(geometry=pd.concat(layer, ignore_index=True), crs=shared_crs)
-        layer_json = layer.to_json(to_wgs84=True)
+        layer_json = layer_joined.to_json(to_wgs84=True)
         folium.GeoJson(layer_json).add_to(m)
     folium.LayerControl().add_to(m)
+
+    m.fit_bounds(m.get_bounds(), padding=(30, 30))
 
     iframe = m.get_root()._repr_html_()
     return render_template('index.html', iframe=iframe)

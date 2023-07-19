@@ -13,16 +13,14 @@
 {% endblock %}
 
 {% block content %}
-    <div id="holder">
-        <div id="interaction" class="card">
-            <div class="card-body">
-                <h4 class="card-title">Simulation</h4>
-                <button id="run_sim" type="button" class="btn btn-primary">Run simulation</button>
-                <h5 class="card-subtitle">Progress</h5>
-                <div id="sim_progress" class="overflow-auto"></div>
+    <div id="interaction" class="card">
+        <div class="card-body">
+            <h4 class="card-title">Balloon simulations setup</h4>
+            <button id="run_sim" type="button" class="btn btn-primary">Start predicting</button>
             </div>
-        </div>
-        <h1>Using an iframe</h1>
+            </div>
+            <h1>Using an iframe</h1>
+    <div id="iframe_holder">
         {{ iframe|safe }}
     </div>
 {% endblock %}

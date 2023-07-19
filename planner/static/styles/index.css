@@ -1,15 +1,23 @@
-#holder {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+#iframe_holder {
+    flex-grow: 1;
 }
 
 #interaction {
     position: absolute;
-    top: 5em;
-    right: 5em;
-    width: 30em;
-    height: 20em;
+    top: 20em;
+        left: 3em;
+        width: 25em;
+        height: 30em;
     padding: 1em;
     background-color: rgba(211, 211, 211, 0.6);
     border: 1px solid rgba(95, 95, 95, 0.6);

@@ -30,3 +30,16 @@ class Config:
     SCHEDULER_EXECUTORS = {
         'default': ProcessPoolExecutor(5)
     }
+
+
+class ConfigDevelopment(Config):
+    JOBS = [
+        {
+            'id': 'run_astra_sims_within_5_seconds',
+            'func': 'planner.tasks:run_astra_sims_background',
+            'trigger': 'date',
+            'run_date': datetime.now(timezone.utc) + timedelta(seconds=5),
+            'replace_existing': True,
+            'timezone': 'UTC',
+        },
+    ]

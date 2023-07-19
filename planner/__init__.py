@@ -1,14 +1,20 @@
-import atexit
+import os
 
 from flask import Flask
 
-from config import Config
+from config import Config, ConfigDevelopment
 from planner.extensions import db, migrate, scheduler
 
 
-def create_app(config_class=Config):
+def create_app():
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    environment = os.getenv('FLASK_ENV')
+    if environment == 'production':
+        app.config.from_object(Config)
+    elif environment == 'development':
+        app.config.from_object(ConfigDevelopment)
+    else:
+        raise ValueError(f"FLASK_ENV={environment} is not a valid environment. Use 'production' or 'development'")
 
     # Initialize Flask extensions here
     db.init_app(app)
@@ -16,7 +22,6 @@ def create_app(config_class=Config):
 
     scheduler.init_app(app)
     scheduler.start()
-    # atexit.register(lambda: scheduler.shutdown(wait=False))
 
     # Register blueprints here
     from planner.main import bp as main_bp

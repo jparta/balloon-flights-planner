@@ -1,0 +1,6 @@
+- Remove wekbsockets
+- Add a window to create a launch area
+- Add a window to create a launch configuration
+
+- Preload weather data and use existing files instead of downloading every time !! check Notion notes on implementation !!
+- Make intersection between KDE and bad landing area faster by using a spatial index: https://buntinglabs.com/blog/geopandas-spatial-index-fix-slow-intersections

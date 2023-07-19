@@ -6,8 +6,7 @@ from planner.extensions import db
 
 class TrajectoryPredictionData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    landing_points = db.Column(Geometry(geometry_type='MULTIPOINT'))
-    kde = db.Column(Geometry(geometry_type='POLYGON'))
+    run_at = db.Column(db.DateTime, nullable=False)
     bad_landing_areas = db.Column(Geometry(geometry_type='MULTIPOLYGON'), nullable=True)
 
     def __repr__(self):

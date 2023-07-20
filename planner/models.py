@@ -8,7 +8,7 @@ class TrajectoryPredictionData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     run_at = db.Column(db.DateTime, nullable=False)
     landing_points = db.Column(Geometry(geometry_type='MULTIPOINT'), nullable=False)
-    kde = db.Column(Geometry(geometry_type='POLYGON'), nullable=False)
+    kde = db.Column(Geometry(geometry_type='MULTIPOLYGON'), nullable=False)
     bad_landing_areas = db.Column(Geometry(geometry_type='MULTIPOLYGON'), nullable=True)
 
     def __repr__(self):

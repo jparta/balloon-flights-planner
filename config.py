@@ -13,11 +13,10 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')\
         or 'postgresql://postgres:postgres@localhost:5432/planner'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
     JOBS = [
         {
             'id': 'run_astra_sims',
-            'func': 'planner.tasks:run_astra_sims_background',
+            'func': 'planner.tasks:run_astra_sims',
             'trigger': 'cron',
             'hour': '1,7,13,19',
             'replace_existing': True,
@@ -36,7 +35,7 @@ class ConfigDevelopment(Config):
     JOBS = [
         {
             'id': 'run_astra_sims_within_5_seconds',
-            'func': 'planner.tasks:run_astra_sims_background',
+            'func': 'planner.tasks:run_astra_sims',
             'trigger': 'date',
             'run_date': datetime.now(timezone.utc) + timedelta(seconds=5),
             'replace_existing': True,

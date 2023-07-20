@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from apscheduler.executors.pool import ProcessPoolExecutor
-from apscheduler.jobstores.memory import MemoryJobStore
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
 
 basedir = Path(__file__).parent
@@ -13,32 +13,13 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')\
         or 'postgresql://postgres:postgres@localhost:5432/planner'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JOBS = [
-        {
-            'id': 'run_astra_sims',
-            'func': 'planner.tasks:run_astra_sims',
-            'trigger': 'cron',
-            'hour': '1,7,13,19',
-            'replace_existing': True,
-            'timezone': 'UTC',
-        },
-    ]
     SCHEDULER_JOBSTORES = {
-        'default': MemoryJobStore()
+        'default': SQLAlchemyJobStore(url=SQLALCHEMY_DATABASE_URI)
     }
     SCHEDULER_EXECUTORS = {
-        'default': ProcessPoolExecutor(5)
+        'default': ProcessPoolExecutor(1)
     }
 
 
 class ConfigDevelopment(Config):
-    JOBS = [
-        {
-            'id': 'run_astra_sims_within_5_seconds',
-            'func': 'planner.tasks:run_astra_sims',
-            'trigger': 'date',
-            'run_date': datetime.now(timezone.utc) + timedelta(seconds=5),
-            'replace_existing': True,
-            'timezone': 'UTC',
-        },
-    ]
+    pass

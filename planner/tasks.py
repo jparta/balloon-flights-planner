@@ -7,7 +7,7 @@ from find_launch_time.logic.proportion_of_kde import EnhancedEnsembleOutputs
 from geoalchemy2.shape import from_shape
 from shapely.geometry import MultiPolygon, MultiPoint
 
-from planner import scheduler, db
+from planner.extensions import scheduler, db
 from planner.models import TrajectoryPredictionData
 
 
@@ -40,6 +40,8 @@ def save_simulation_results_to_db(
     scheduler.app.logger.debug(f"Saved prediction data to db")
 
 
+@scheduler.task('date', id='test_task', run_date=datetime.now(timezone.utc) + timedelta(seconds=5), timezone='UTC')
+@scheduler.task('cron', id='run_astra_sims', hour='0,6,12,18', minute='30', timezone='UTC')
 def run_astra_sims():
     scheduler.app.logger.info("Running astra sims")
     time_finder = find_time.FindTime(debug=scheduler.app.debug)

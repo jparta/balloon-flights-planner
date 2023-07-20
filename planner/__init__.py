@@ -3,6 +3,7 @@ import os
 from flask import Flask
 
 from config import Config, ConfigDevelopment
+from planner import tasks
 from planner.extensions import db, migrate, scheduler
 
 

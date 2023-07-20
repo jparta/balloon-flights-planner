@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from apscheduler.executors.pool import ProcessPoolExecutor
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.jobstores.memory import MemoryJobStore
 
 
 basedir = Path(__file__).parent
@@ -25,7 +25,7 @@ class Config:
         },
     ]
     SCHEDULER_JOBSTORES = {
-        'default': SQLAlchemyJobStore(url=SQLALCHEMY_DATABASE_URI)
+        'default': MemoryJobStore()
     }
     SCHEDULER_EXECUTORS = {
         'default': ProcessPoolExecutor(5)

@@ -1,7 +1,7 @@
 apscheduler
 astra @ git+https://github.com/jparta/astra_simulator@master
-find_launch_site @ file:///home/jpartanen/Documents/masters_thesis/repos/find_launch_site
-find_launch_time @ git+file://putanythinghere/home/jpartanen/Documents/masters_thesis/repos/find_launch_time
+find_launch_site @ git+https://github.com/jparta/find_launch_site@master
+find_launch_time @ git+https://github.com/jparta/find_launch_time@master
 flask ~= 2.2
 flask_apscheduler
 flask_migrate

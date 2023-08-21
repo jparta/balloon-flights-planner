@@ -12,7 +12,6 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')\
         or 'postgresql://postgres:postgres@localhost:5432/planner'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SCHEDULER_JOBSTORES = {
         'default': SQLAlchemyJobStore(url=SQLALCHEMY_DATABASE_URI)
     }

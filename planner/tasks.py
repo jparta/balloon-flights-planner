@@ -57,6 +57,7 @@ def run_astra_sims():
     prediction_data = time_finder.get_prediction_geometries(
         prediction_window_length=timedelta(days=7),
         launch_time_increment=timedelta(hours=3),
+        sims_per_launch_time=25,
     )
     for prediction in prediction_data:
         save_simulation_results_to_db(prediction, start_time)

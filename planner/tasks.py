@@ -15,15 +15,19 @@ def save_simulation_results_to_db(
     prediction: EnhancedEnsembleOutputs,
     start_time: datetime,
 ):
-    field_name_conversion = {
+    geometry_name_conversion = {
         "predicted_landing_sites": "landing_points",
         "kde": "kde",
         "bad_landing_areas": "bad_landing_areas",
     }
+    other_fields_name_conversion = {
+        "proportion_of_bad_landing_to_kde": "bad_landing_proportion",
+        "launch_time": "launch_time",
+    }
     # map EnhancedEnsembleOutputs attributes to TrajectoryPredictionData db fields
     out_data: dict[str, Any] = {}
     out_data["run_at"] = start_time
-    for from_name, to_name in field_name_conversion.items():
+    for from_name, to_name in geometry_name_conversion.items():
         gdf = getattr(prediction, from_name)
         if gdf is not None:
             # Make sure we have the right geometry types
@@ -33,6 +37,10 @@ def save_simulation_results_to_db(
             elif to_name in ('kde', 'bad_landing_areas') and geometry.geom_type == 'Polygon':
                 geometry = MultiPolygon([geometry])
             out_data[to_name] = from_shape(geometry, srid=gdf.crs.to_epsg(), extended=True)
+    for from_name, to_name in other_fields_name_conversion.items():
+        field_value = getattr(prediction, from_name)
+        if field_value is not None:
+            out_data[to_name] = field_value
     prediction_object = TrajectoryPredictionData(**out_data)
     with scheduler.app.app_context():
         db.session.add(prediction_object)

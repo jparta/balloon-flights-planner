@@ -77,40 +77,58 @@ def index():
     current_app.logger.info(f"Bad landing size: \n{bad_landing_size:>20} bytes")
     """
 
+    def bad_landing_porportion_color(bad_landing_proportion):
+        threshold = 0.05
+        return "#4dac26" if bad_landing_proportion < threshold else "#d01c8b"
+
+    def kde_style_function(feature):
+        bad_landing_proportion = feature['properties']['bad_landing_proportion']
+        return {
+            "fillColor":    bad_landing_porportion_color(bad_landing_proportion),
+            "fillOpacity":  0.5,
+            "color":        "black",
+            "weight":       1,
+        }
+
     layer_add_start = time.time()
     for prediction_data in query.all():
         prediction_df = prediction_data.to_gdf()
-        prediction_df["launch_time"] = prediction_df["launch_time"].map(lambda dt: dt.isoformat())
+        prediction_df["launch_time"] = prediction_df["launch_time"].map(lambda dt: dt.round(freq='min').isoformat())
+        prediction_df["sim_count"] = prediction_df["landing_points"].map(lambda points: len(points.geoms))
+        prediction_df["bad_landing_proportion"] = prediction_df["bad_landing_proportion"].round(3)
 
         # current_app.logger.info(f"Prediction data: \n{prediction_df.dtypes}")
-        kde_json = prediction_df[["launch_time", "kde"]].set_geometry("kde").to_json(to_wgs84=True)
-        # current_app.logger.info(f"KDE json: \n{pformat(kde_json)}")
-        kde_layer = folium.Choropleth(
-            name="Kernel density estimate",
-            geo_data=kde_json,
-            fill_color="yellow",
-            fill_opacity=0.5,
-            line_color="black",
-            line_weight=1,
-            highlight=False,
-        )
-        kde_layer.geojson.add_child(features.GeoJsonTooltip(["launch_time"]))
-        kde_layer.add_to(m)
-
-        """
-        landing_layer = fol_map.FeatureGroup(name="Predicted landing locations")
-        landing_xys = join_list_of_geoseries(landing_points).to_crs("4326").get_coordinates()
-        for loc in zip(landing_xys['y'], landing_xys['x']):
-            folium.CircleMarker(loc, radius=0.5, color="black", fill=True).add_to(landing_layer)
-        landing_layer.add_to(m)
-
-        folium.Choropleth(
-            name="Bad landing areas",
-            geo_data=join_list_of_geoseries(bad_landing_areas),
-            fill_color="red",
-            highlight=False,
-        ).add_to(m)
-        """
+        kde_gdf = prediction_df[["kde", "launch_time", "bad_landing_proportion", "sim_count"]].set_geometry("kde")
+        for row_index in range(len(kde_gdf)):
+            kde_row = kde_gdf.iloc[[row_index]]
+            kde_json = kde_row.to_json(to_wgs84=True)
+            """
+            kde_layer = folium.Choropleth(
+                name="Kernel density estimate",
+                geo_data=kde_json,
+                fill_color="yellow",
+                fill_opacity=0.5,
+                line_color="black",
+                line_weight=1,
+                highlight=False,
+            )
+            kde_layer.geojson.add_child(features.GeoJsonTooltip(["launch_time"]))
+            """
+            tooltip = folium.GeoJsonTooltip(
+                fields=["launch_time", "bad_landing_proportion", "sim_count"],
+                aliases=["Launch time", "Bad landing proportion", "Simulation count"],
+            )
+            name_template = '<span style="color: {color};">{content}</span>'
+            color = bad_landing_porportion_color(kde_row["bad_landing_proportion"].item())
+            content = f"{kde_row['launch_time'].item()} UTC"
+            name_html = name_template.format(color=color, content=content)
+            kde_layer = folium.GeoJson(
+                data=kde_json,
+                style_function=kde_style_function,
+                name=name_html,
+                tooltip=tooltip,
+            )
+            kde_layer.add_to(m)
     layer_add_end = time.time()
     current_app.logger.info(f"Layer add took {layer_add_end - layer_add_start} seconds")
 

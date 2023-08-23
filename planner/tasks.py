@@ -32,6 +32,8 @@ def save_simulation_results_to_db(
         if gdf is not None:
             # Make sure we have the right geometry types
             geometry = gdf.geometry.unary_union
+            if geometry is None or geometry.is_empty:
+                continue
             if to_name == 'landing_points' and geometry.geom_type == 'Point':
                 geometry = MultiPoint([geometry])
             elif to_name in ('kde', 'bad_landing_areas') and geometry.geom_type == 'Polygon':

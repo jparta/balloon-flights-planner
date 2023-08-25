@@ -50,13 +50,40 @@ def save_simulation_results_to_db(
     scheduler.app.logger.debug(f"Saved prediction data to db")
 
 
+def make_launch_inputs():
+    launch_coords_possibilities = {
+        "Kartanonrannan_koulu": (60.153144, 24.551671),
+        "Vantinlaakso": (60.184101, 24.623690)
+    }
+    launch_coords = launch_coords_possibilities["Vantinlaakso"]
+    flight_train_mass_kg = 0.770
+    flight_train_equiv_sphere_diam = 0.285
+    balloon = "TA350"
+    nozzle_lift_kg = 1.46
+    parachute = "SFP800"
+
+    launch_inputs = find_time.LaunchInputs(
+        launch_coords_WGS84=launch_coords,
+        flight_train_mass_kg=flight_train_mass_kg,
+        flight_train_equiv_sphere_diam=flight_train_equiv_sphere_diam,
+        balloon=balloon,
+        nozzle_lift_kg=nozzle_lift_kg,
+        parachute=parachute,
+    )
+    return launch_inputs
+
+
 @scheduler.task('date', id='test_task', run_date=datetime.now(timezone.utc) + timedelta(seconds=5), timezone='UTC')
 @scheduler.task('cron', id='run_astra_sims', hour='0,6,12,18', minute='30', timezone='UTC')
 def run_astra_sims():
     scheduler.app.logger.info("Running astra sims")
     time_finder = find_time.FindTime(debug=scheduler.app.debug)
     start_time = datetime.now(timezone.utc)
+
+    launch_inputs = make_launch_inputs()
+
     prediction_data = time_finder.get_prediction_geometries(
+        launch_inputs=launch_inputs,
         prediction_window_length=timedelta(days=7),
         launch_time_increment=timedelta(hours=3),
         sims_per_launch_time=25,

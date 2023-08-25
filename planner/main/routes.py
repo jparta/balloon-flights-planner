@@ -1,12 +1,10 @@
-from datetime import datetime, timezone
-from pprint import pformat
 import time
 import folium
 import geopandas as gpd
 import pandas as pd
+from datetime import datetime, timezone, timedelta
 from flask import render_template, current_app
-from folium import features
-from sqlalchemy import and_, func
+from sqlalchemy import and_
 
 from planner import db
 from planner.main import bp
@@ -45,18 +43,12 @@ def index():
     landing_points = []
 
     query_start = time.time()
-    # query the latest trajectory predictions for each launch time
-    subq = db.session.query(
-        TrajectoryPredictionData.launch_time,
-        func.max(TrajectoryPredictionData.run_at).label("max_run_at")
-    ).group_by(TrajectoryPredictionData.launch_time).subquery()
-    query = db.session.query(TrajectoryPredictionData).join(
-        subq,
+    query = db.session.query(TrajectoryPredictionData).filter(
         and_(
-            TrajectoryPredictionData.launch_time == subq.c.launch_time,
-            TrajectoryPredictionData.run_at == subq.c.max_run_at
+            TrajectoryPredictionData.launch_time >= datetime.now(timezone.utc),
+            TrajectoryPredictionData.run_at >= datetime.now(timezone.utc) + timedelta(hours=-9)
         )
-    ).filter(TrajectoryPredictionData.launch_time >= datetime.now(timezone.utc))
+    )
 
     # load to GeoPandas
     # gpd.read_postgis(query.statement, query.session.get_bind(), geom_col='kde')

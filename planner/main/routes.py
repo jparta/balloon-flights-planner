@@ -118,7 +118,7 @@ def index():
                 fields=["launch_time", "bad_landing_proportion", "sim_count"],
                 aliases=["Launch time", "Bad landing proportion", "Simulation count"],
             )
-            name_template = '<span style="color: {color};">{content}</span>'
+            name_template = '<span style="background-color: {color}; color: white">{content}</span>'
             color = bad_landing_porportion_color(kde_row["bad_landing_proportion"].item())
             content = f"{kde_row['launch_time'].item()} UTC"
             name_html = name_template.format(color=color, content=content)
@@ -132,7 +132,7 @@ def index():
     layer_add_end = time.time()
     current_app.logger.info(f"Layer add took {layer_add_end - layer_add_start} seconds")
 
-    folium.LayerControl(collapsed=False).add_to(m)
+    folium.LayerControl(collapsed=False, sortLayers=True).add_to(m)
     
     m.fit_bounds(m.get_bounds(), padding=(30, 30))
 

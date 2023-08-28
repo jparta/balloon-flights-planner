@@ -91,18 +91,26 @@ def index():
     current_app.logger.info(f"Bad landing size: \n{bad_landing_size:>20} bytes")
     """
 
-    def bad_landing_porportion_color(bad_landing_proportion):
+    def bad_landing_proportion_okay(bad_landing_proportion):
         threshold = 0.05
-        return "#4dac26" if bad_landing_proportion < threshold else "#d01c8b"
+        return bad_landing_proportion < threshold
+    
+    def kde_color(landing_okay: bool):
+        return "#4dac26" if landing_okay else "#d01c8b"
+
 
     def kde_style_function(feature):
         bad_landing_proportion = feature['properties']['bad_landing_proportion']
+        landing_okay = bad_landing_proportion_okay(bad_landing_proportion)
         return {
-            "fillColor":    bad_landing_porportion_color(bad_landing_proportion),
+            "fillColor":    kde_color(landing_okay),
             "fillOpacity":  0.5,
             "color":        "black",
             "weight":       1,
         }
+    
+    fg_name = f'<span style="background-color: {kde_color(landing_okay=False)}; color: white">{"Bad landing"}</span>'
+    bad_landing_feature_group = folium.FeatureGroup(name=fg_name).add_to(m)
 
     predictions = query.all()
     predictions_time_blocked = one_prediction_per_time_block(predictions, block_width_hours=3)
@@ -136,7 +144,8 @@ def index():
                 aliases=["Launch time", "Bad landing proportion", "Simulation count"],
             )
             name_template = '<span style="background-color: {color}; color: white">{content}</span>'
-            color = bad_landing_porportion_color(kde_row["bad_landing_proportion"].item())
+            landing_okay = bad_landing_proportion_okay(kde_row["bad_landing_proportion"].item())
+            color = kde_color(landing_okay)
             content = f"{kde_row['launch_time'].item()} UTC"
             name_html = name_template.format(color=color, content=content)
             kde_layer = folium.GeoJson(
@@ -145,6 +154,10 @@ def index():
                 name=name_html,
                 tooltip=tooltip,
             )
+            if landing_okay:
+                kde_layer.add_to(m)
+            else:
+                kde_layer.add_to(bad_landing_feature_group)
     
     # Add the launch spot
     launch_inputs = make_launch_inputs()

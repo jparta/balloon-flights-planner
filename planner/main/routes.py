@@ -9,6 +9,7 @@ from sqlalchemy import and_
 from planner import db
 from planner.main import bp
 from planner.models import TrajectoryPredictionData
+from planner.tasks import make_launch_inputs
 
 
 def join_list_of_geoseries(geolist) -> gpd.GeoDataFrame:
@@ -120,7 +121,14 @@ def index():
                 name=name_html,
                 tooltip=tooltip,
             )
-            kde_layer.add_to(m)
+    
+    # Add the launch spot
+    launch_inputs = make_launch_inputs()
+    launch_spot = folium.Marker(
+        launch_inputs.launch_coords_WGS84,
+        tooltip="Launch location",
+        icon=folium.Icon(color="purple", icon="rocket", prefix="fa"),
+    ).add_to(m)
     layer_add_end = time.time()
     current_app.logger.info(f"Layer add took {layer_add_end - layer_add_start} seconds")
 

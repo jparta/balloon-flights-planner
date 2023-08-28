@@ -32,6 +32,27 @@ def mapready_geojson_from_geoseries(geoseries, layer_name):
     return layer_json
 
 
+def one_prediction_per_time_block(predictions: list[TrajectoryPredictionData], block_width_hours: float | int):
+    """For each time block on the launch time axis, return the prediction with the latest run_at time"""
+    predictions_by_block = {}
+    current_app.logger.info(f"Predictions count: {len(predictions)}")
+    for prediction in predictions:
+        launch_time = prediction.launch_time
+        block_start_hour = launch_time.hour - launch_time.hour % block_width_hours
+        block_start = launch_time.replace(hour=block_start_hour, minute=0, second=0, microsecond=0)
+        block_start = launch_time - timedelta(hours=launch_time.hour % block_width_hours, minutes=launch_time.minute, seconds=launch_time.second, microseconds=launch_time.microsecond)
+        block_end = block_start + timedelta(hours=block_width_hours)
+        if block_start not in predictions_by_block:
+            predictions_by_block[block_start] = prediction
+        else:
+            existing_prediction = predictions_by_block[block_start]
+            if existing_prediction.run_at < prediction.run_at:
+                predictions_by_block[block_start] = prediction
+    blocked_predictions = list(predictions_by_block.values())
+    current_app.logger.info(f"Blocked predictions count: {len(blocked_predictions)}")
+    current_app.logger.info(f"Block starts: {predictions_by_block.keys()}")
+    return blocked_predictions
+
 @bp.route('/')
 def index():
     m = folium.Map()
@@ -83,8 +104,11 @@ def index():
             "weight":       1,
         }
 
+    predictions = query.all()
+    predictions_time_blocked = one_prediction_per_time_block(predictions, block_width_hours=3)
+
     layer_add_start = time.time()
-    for prediction_data in query.all():
+    for prediction_data in predictions_time_blocked:
         prediction_df = prediction_data.to_gdf()
         prediction_df["launch_time"] = prediction_df["launch_time"].map(lambda dt: dt.round(freq='min').isoformat())
         prediction_df["sim_count"] = prediction_df["landing_points"].map(lambda points: len(points.geoms))

@@ -46,7 +46,7 @@ def index():
     query = db.session.query(TrajectoryPredictionData).filter(
         and_(
             TrajectoryPredictionData.launch_time >= datetime.now(timezone.utc),
-            TrajectoryPredictionData.run_at >= datetime.now(timezone.utc) + timedelta(hours=-9)
+            TrajectoryPredictionData.run_at >= datetime.now(timezone.utc) + timedelta(hours=-6)
         )
     )
 

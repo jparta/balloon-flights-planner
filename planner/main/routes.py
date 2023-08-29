@@ -35,7 +35,7 @@ def mapready_geojson_from_geoseries(geoseries, layer_name):
 def one_prediction_per_time_block(predictions: list[TrajectoryPredictionData], block_width_hours: float | int):
     """For each time block on the launch time axis, return the prediction with the latest run_at time"""
     predictions_by_block = {}
-    current_app.logger.info(f"Predictions count: {len(predictions)}")
+    current_app.logger.debug(f"Predictions count: {len(predictions)}")
     for prediction in predictions:
         launch_time = prediction.launch_time
         block_start_hour = launch_time.hour - launch_time.hour % block_width_hours
@@ -49,8 +49,7 @@ def one_prediction_per_time_block(predictions: list[TrajectoryPredictionData], b
             if existing_prediction.run_at < prediction.run_at:
                 predictions_by_block[block_start] = prediction
     blocked_predictions = list(predictions_by_block.values())
-    current_app.logger.info(f"Blocked predictions count: {len(blocked_predictions)}")
-    current_app.logger.info(f"Block starts: {predictions_by_block.keys()}")
+    current_app.logger.debug(f"Blocked predictions count: {len(blocked_predictions)}")
     return blocked_predictions
 
 @bp.route('/')

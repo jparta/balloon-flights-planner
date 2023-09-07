@@ -18,6 +18,8 @@ class Config:
     SCHEDULER_EXECUTORS = {
         'default': ProcessPoolExecutor(1)
     }
+    SCHEDULER_MISFIRE_GRACE_TIME = 6 * 60 * 60
+    SCHEDULER_COALESCING = True
 
 
 class ConfigDevelopment(Config):

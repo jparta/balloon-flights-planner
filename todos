@@ -1,6 +1,11 @@
-- Create launch time selector
-  * Add JS function to the layer template so that the table cells are connected to the polygons
+- If a launch time of interest is chosen, conduct runs of simulations around that launch time with a higher temporal resolution
+
+- Estimate resolution that is possible when imaging the ground based on the flight track of the balloon
+
 - Add a window to create a launch area
+
 - Add a window to create a launch configuration
 
 - Preload weather data and use existing files instead of downloading every time !! check Notion notes on implementation !!
+
+- Alert about good launch windows, when launch weather and landing area are good

@@ -11,7 +11,9 @@ To start, follow these steps:
 A scheduled task, starting trajectory simulations, runs immediately after starting running Flask.
 
 Here's the scheduled task overview:
+
 ![app_high_level_structure_scheduled_task](https://github.com/jparta/balloon-flights-planner/assets/25590558/aab48437-f0e6-40db-b79a-c28bda24de69)
 
 Here's the map fetch overview:
+
 ![app_high_level_structure_map_fetch](https://github.com/jparta/balloon-flights-planner/assets/25590558/a339a686-c505-420c-ad78-2051e97a33b0)
